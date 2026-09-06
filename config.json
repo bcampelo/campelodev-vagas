@@ -1,0 +1,14 @@
+{
+  "repos": [
+    "backend-br/vagas",
+    "frontendbr/vagas",
+    "soujava/vagas",
+    "react-brasil/vagas"
+  ],
+  "porRepo": 40,
+  "maxPorExecucao": 6,
+  "nivel": "\\b(j[uú]nior|junior|jr\\.?|est[aá]gio|estagi[aá]ri[oa]|trainee|iniciante|entry[- ]level)\\b",
+  "stack": "\\b(java|spring|kotlin|node|nodejs|javascript|typescript|react|next|python|django|sql|postgres|mysql|api|back[- ]?end|front[- ]?end|full[- ]?stack)\\b",
+  "remoto": "\\b(remoto|remote|home[- ]office|h[ií]brido)\\b",
+  "bloqueio": "\\b(s[eê]nior|senior|sr\\.?|pleno|especialista|staff|principal|tech lead|l[ií]der t[eé]cnic|gerente|coordenador|arquiteto)\\b"
+}

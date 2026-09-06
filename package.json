@@ -1,0 +1,16 @@
+{
+  "name": "campelodev-vagas",
+  "version": "1.0.0",
+  "description": "Bot que garimpa vagas de junior e estagio nos repositorios de vagas da comunidade dev brasileira e posta no Discord do CampeloDev.",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dry": "DRY_RUN=1 node src/index.js",
+    "test": "node --test"
+  },
+  "license": "MIT"
+}
