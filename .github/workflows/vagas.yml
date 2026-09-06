@@ -2,8 +2,8 @@ name: Caçador de Vagas
 
 on:
   schedule:
-    # de hora em hora, aos 15 minutos. Horário do agendamento é UTC.
-    - cron: '15 * * * *'
+    # de 15 em 15 minutos. Horário do agendamento é UTC.
+    - cron: '*/15 * * * *'
   workflow_dispatch:
 
 permissions:

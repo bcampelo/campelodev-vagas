@@ -6,7 +6,7 @@ Roda inteiro no GitHub Actions. Sem servidor, sem custo e sem token de bot.
 
 ## Como funciona
 
-De hora em hora o Action busca as issues abertas mais recentes dos repositórios listados em `config.json`, descarta o que já foi postado, aplica o filtro de senioridade e manda o que sobrou para um webhook do Discord.
+De 15 em 15 minutos o Action busca as issues abertas mais recentes dos repositórios listados em `config.json`, descarta o que já foi postado, aplica o filtro de senioridade e manda o que sobrou para um webhook do Discord.
 
 O que já foi postado fica em `data/vistos.json`, que o próprio Action commita de volta. É o que impede a mesma vaga de aparecer duas vezes.
 
