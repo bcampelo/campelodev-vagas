@@ -3,24 +3,40 @@ import { config } from './config.js';
 /**
  * Decide se a vaga entra no canal.
  *
- * A regra é estreita de propósito. Canal sem filtro recebe 40 vagas de sênior
- * por dia e todo mundo muta, e canal mudo é canal morto. Só passa vaga que
- * alguém da comunidade pode de fato se candidatar hoje, ou seja, júnior,
- * estágio, trainee ou entrada.
+ * A lógica é por exclusão, não por inclusão. O filtro antigo só deixava passar
+ * quem escrevia "júnior" ou "estágio" no título, e a maioria das vagas não
+ * escreve nível nenhum. Resultado, quase tudo era barrado.
  *
- * Se um dia quiser afrouxar, mexa em `nivel` no config.json, não aqui.
+ * Agora a pergunta é outra. Em vez de "essa vaga diz que é de entrada?",
+ * a pergunta é "essa vaga diz que NÃO é pra quem está começando?".
+ * Quem não diz nada passa, porque na dúvida a pessoa lê e decide sozinha.
  */
 export function serve(vaga) {
-  const texto = `${vaga.titulo} ${vaga.etiquetas.join(' ')}`;
+  const texto = `${vaga.titulo} ${(vaga.etiquetas || []).join(' ')}`;
 
-  if (!config.nivel.test(texto)) return false;
+  // Vaga velha provavelmente já foi preenchida, e enche o canal à toa.
+  if (config.maxDias && vaga.criadaEm) {
+    const dias = (Date.now() - new Date(vaga.criadaEm).getTime()) / 86400000;
+    if (dias > config.maxDias) return false;
+  }
 
-  // "Júnior ou Pleno" passa. "Pleno/Sênior" com um "jr" solto no meio, não.
-  const pedeSenioridade = config.bloqueio.test(vaga.titulo);
-  const ehEntrada = config.nivel.test(vaga.titulo);
-  if (pedeSenioridade && !ehEntrada) return false;
+  // Diz que é de entrada, passa sempre, mesmo que também cite pleno.
+  if (ehEntrada(vaga)) return true;
 
+  // Diz que é sênior, pleno, lead ou gestão, barra.
+  if (config.senioridade.test(texto)) return false;
+
+  // Pede "5+ anos" no corpo, barra. O "+" é obrigatório na regex de propósito,
+  // senão "1 a 3 anos" seria barrado por engano.
+  if (config.muitaExperiencia.test(vaga.corpo || '')) return false;
+
+  // Não disse o nível. Passa.
   return true;
+}
+
+/** A vaga se declara de entrada. Usado no filtro e na ordem de postagem. */
+export function ehEntrada(vaga) {
+  return config.nivel.test(`${vaga.titulo} ${(vaga.etiquetas || []).join(' ')}`);
 }
 
 /** Separa "[Remoto] Dev Java Júnior - Empresa" nas partes que vão pro embed. */

@@ -1,6 +1,6 @@
 import { config } from './config.js';
 import { buscarVagas } from './github.js';
-import { serve } from './filtro.js';
+import { serve, ehEntrada } from './filtro.js';
 import { postar } from './discord.js';
 import { ler, gravar } from './estado.js';
 
@@ -33,14 +33,20 @@ for (const repo of config.repos) {
   }
 }
 
-// mais antigas primeiro, pra o canal ficar em ordem cronológica
-candidatas.sort((a, b) => new Date(a.criadaEm) - new Date(b.criadaEm));
+// Vaga que se declara de entrada vai na frente. Entre iguais, a mais antiga
+// primeiro, pra o canal ficar em ordem cronológica e a vaga não vencer na fila.
+candidatas.sort((a, b) => {
+  const pa = ehEntrada(a) ? 0 : 1;
+  const pb = ehEntrada(b) ? 0 : 1;
+  if (pa !== pb) return pa - pb;
+  return new Date(a.criadaEm) - new Date(b.criadaEm);
+});
 
-const cortadas = candidatas.length - config.maxPorExecucao;
 const enviar = candidatas.slice(0, config.maxPorExecucao);
+const cortadas = candidatas.length - enviar.length;
 
 console.log(`\nPara postar: ${enviar.length}${cortadas > 0 ? ` (${cortadas} ficaram pra próxima)` : ''}`);
-for (const v of enviar) console.log(`  · ${v.titulo}  ${v.url}`);
+for (const v of enviar) console.log(`  ${ehEntrada(v) ? '*' : ' '} ${v.titulo}  ${v.url}`);
 
 if (!DRY && enviar.length) {
   await postar(WEBHOOK, enviar);
@@ -51,7 +57,13 @@ if (!DRY && enviar.length) {
 // as vagas voltam na próxima execução em vez de sumirem para sempre.
 if (!DRY) await gravar(estado, enviar.map((v) => v.id));
 
-if (problemas.length && !enviar.length) {
-  console.error('\nNenhuma vaga postada e houve erro de origem.');
+// Falha só quando nenhuma origem respondeu. Rodada sem vaga nova é o normal,
+// e uma origem quebrada não pode reprovar a execução inteira.
+if (problemas.length === config.repos.length) {
+  console.error('\nNenhuma das origens respondeu.');
   process.exit(1);
+}
+if (problemas.length) {
+  console.log(`\nAviso, ${problemas.length} origem(ns) com problema:`);
+  for (const p of problemas) console.log(`  ${p}`);
 }

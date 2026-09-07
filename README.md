@@ -21,9 +21,19 @@ src/index.js         orquestra
 
 ## Filtro
 
-Só passa vaga de entrada, ou seja, júnior, estágio, trainee ou iniciante. A regra é estreita de propósito. Canal sem filtro recebe dezenas de vagas de sênior por dia, e canal que gera notificação inútil é canal mutado.
+A lógica é por exclusão. A pergunta não é "essa vaga diz que é de entrada?", e sim "essa vaga diz que NÃO é pra quem está começando?".
 
-Para afrouxar ou apertar, mexa no `config.json`, não no código.
+| Situação | Resultado |
+|---|---|
+| Título ou etiqueta dizem júnior, estágio, trainee, jr, iniciante | passa, e vai na frente da fila |
+| Título ou etiqueta dizem sênior, pleno, tech lead, arquiteto, gestão | barra |
+| Corpo pede "5+ anos" | barra |
+| Vaga com mais de `maxDias` dias | barra |
+| Não diz nível nenhum | passa |
+
+A última linha é a que mais muda o resultado. A maioria das vagas não escreve o nível no título, e antes todas elas eram barradas.
+
+Para apertar ou afrouxar, mexa no `config.json`, não no código. `maxDias` controla o quanto de vaga velha entra e `maxPorExecucao` limita quantas saem por rodada.
 
 ## Rodar local
 

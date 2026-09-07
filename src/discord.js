@@ -7,7 +7,7 @@ function embed(vaga) {
   const { modalidade, nivel, empresa } = detalhes(vaga);
 
   const campos = [];
-  if (nivel) campos.push({ name: 'Nível', value: capitalizar(nivel), inline: true });
+  campos.push({ name: 'Nível', value: nivel ? capitalizar(nivel) : 'Não informado', inline: true });
   if (modalidade) campos.push({ name: 'Modalidade', value: capitalizar(modalidade), inline: true });
   if (empresa && empresa.length <= 60) campos.push({ name: 'Empresa', value: empresa, inline: true });
 
